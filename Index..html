@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workforce Modular - Time Logger</title>
+    <style>
+        :root {
+            --color-primary: #32b8c6;
+            --color-primary-hover: #2a9aaa;
+            --color-success: #32b8c6;
+            --color-error: #ff6b6b;
+            --color-warning: #ffa500;
+            --color-bg-light: #1a1a1a;
+            --color-bg: #0f0f0f;
+            --color-surface: #1e1e1e;
+            --color-border: #333333;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #a0a0a0;
+            --space-8: 8px;
+            --space-16: 16px;
+            --space-24: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            padding: var(--space-16);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #000000;
+            padding: 80px 24px;
+            margin: -16px -16px 24px -16px;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        header img {
+            height: 320px;
+            width: auto;
+        }
+
+        header p {
+            margin: 0;
+            padding: 0;
+            color: var(--color-text-secondary);
+            font-size: 10px;
+            letter-spacing: 2px;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .form-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: var(--space-24) 0 var(--space-16) 0;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .form-section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background: var(--color-primary);
+            border-radius: 2px;
+        }
+
+        .form-section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: var(--space-16);
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="date"],
+        input[type="text"],
+        input[type="time"],
+        input[type="number"],
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 13px;
+            background: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        input[type="date"]:focus,
+        input[type="text"]:focus,
+        input[type="time"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(50, 184, 198, 0.2);
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: var(--space-8);
+            align-items: end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 150ms ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-light);
+        }
+
+        .btn-danger {
+            background: var(--color-error);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .team-member-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: var(--space-8);
+            margin-bottom: var(--space-12);
+            padding: var(--space-12);
+            background: rgba(50, 184, 198, 0.05);
+            border-radius: 4px;
+            align-items: end;
+        }
+
+        .team-member-row:last-child {
+            margin-bottom: 0;
+        }
+
+        #teamMembersList {
+            margin-bottom: var(--space-12);
+        }
+
+        .summary {
+            background: linear-gradient(135deg, rgba(50, 184, 198, 0.12) 0%, rgba(50, 184, 198, 0.06) 100%);
+            border: 1px solid rgba(50, 184, 198, 0.3);
+            border-radius: 6px;
+            padding: var(--space-16);
+            margin-top: var(--space-24);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-16);
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-item-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .alert {
+            padding: var(--space-12);
+            border-radius: 6px;
+            margin-bottom: var(--space-16);
+            font-size: 13px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+
+        .alert-success {
+            background: rgba(50, 184, 198, 0.15);
+            border: 1px solid rgba(50, 184, 198, 0.3);
+            color: #32b8c6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .time-inputs,
+            .team-member-row {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 60px 24px;
+            }
+
+            header img {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/e3c66f36-8170-438a-a608-fbfacd9a9926" alt="Workforce Modular">
+            <p>TIME LOGGING SYSTEM</p>
+        </header>
+
+        <div class="form-card">
+            <div id="alertError" class="alert alert-error"></div>
+            <div id="alertSuccess" class="alert alert-success"></div>
+
+            <form id="timeLogForm">
+                <h2 style="margin: 0 0 var(--space-16) 0; font-size: 20px; color: var(--color-text);">Daily Time Log</h2>
+
+                <div class="form-group">
+                    <label for="jobDate">Job Date</label>
+                    <input type="date" id="jobDate" name="jobDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="workType">Work Type / Category</label>
+                    <input type="text" id="workType" name="workType" placeholder="e.g., Skirting, Torch Down Roofing, Other" required>
+                </div>
+
+                <h3 class="form-section-title">Time Entry</h3>
+
+                <div class="time-inputs">
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <input type="time" id="startTime" name="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">End Time</label>
+                        <input type="time" id="endTime" name="endTime" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <button type="button" class="btn btn-primary btn-small" onclick="addTimeEntry()">Add Entry</button>
+                    </div>
+                </div>
+
+                <div id="timeEntries" style="margin-top: var(--space-16);">
+                    <div id="entriesList"></div>
+                    <div id="noEntries" style="text-align: center; padding: var(--space-16); color: var(--color-text-secondary); font-size: 13px;">No time entries yet</div>
+                </div>
+
+                <h3 class="form-section-title">Team Members & Rates</h3>
+
+                <div class="form-group">
+                    <label for="memberName">Member Name</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: var(--space-8); align-items: end;">
+                        <input type="text" id="memberName" placeholder="Full name" style="grid-column: 1;">
+                        <input type="number" id="memberRate" placeholder="Hourly rate" step="0.01" min="0" style="grid-column: 2;">
+                        <button type="button" class="btn btn-primary btn-small" onclick="addTeamMember()" style="grid-column: 3;">Add</button>
+                    </div>
+                </div>
+
+                <div id="teamMembersList"></div>
+
+                <div id="summary" class="summary" style="display: none;">
+                    <h3 style="margin: 0 0 var(--space-16) 0; color: var(--color-text);">Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-item-label">Total Hours</span>
+                            <span class="summary-item-value" id="summaryHours">0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-item-label">Team Members</span>
+                            <span class="summary-item-value" id="summaryMembers">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-item-label">Avg Hourly Rate</span>
+                            <span class="summary-item-value">$<span id="summaryAvgRate">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-item-label">Daily Labor Cost</span>
+                            <span class="summary-item-value">$<span id="summaryCost">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <p>Submitting time log...</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-24); padding: 12px 16px; font-size: 16px;">Submit Time Log</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let timeEntries = [];
+        let teamMembers = [];
+
+        const webhookUrl = 'https://hooks.zapier.com/hooks/catch/13649349/uwrdh8i/';
+
+        function setToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('jobDate').value = today;
+        }
+
+        function addTimeEntry() {
+            if (teamMembers.length === 0) {
+                showAlert('Please add team members first before logging time entries', 'error');
+                return;
+            }
+
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!startTime || !endTime) {
+                showAlert('Please select both start and end times', 'error');
+                return;
+            }
+
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+
+            const startTotalMin = startHour * 60 + startMin;
+            const endTotalMin = endHour * 60 + endMin;
+
+            if (endTotalMin <= startTotalMin) {
+                showAlert('End time must be after start time', 'error');
+                return;
+            }
+
+            const hours = (endTotalMin - startTotalMin) / 60;
+
+            timeEntries.push({
+                startTime,
+                endTime,
+                hours: parseFloat(hours.toFixed(2))
+            });
+
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+
+            renderTimeEntries();
+            updateSummary();
+        }
+
+        function removeTimeEntry(index) {
+            timeEntries.splice(index, 1);
+            renderTimeEntries();
+            updateSummary();
+        }
+
+        function renderTimeEntries() {
+            const entriesList = document.getElementById('entriesList');
+            const noEntries = document.getElementById('noEntries');
+
+            if (timeEntries.length === 0) {
+                entriesList.innerHTML = '';
+                noEntries.style.display = 'block';
+                return;
+            }
+
+            noEntries.style.display = 'none';
+            entriesList.innerHTML = timeEntries.map((entry, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-12); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 4px; margin-bottom: var(--space-8); font-size: 13px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--color-primary);">${entry.startTime} - ${entry.endTime}</div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">${entry.hours.toFixed(2)} hours</div>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="removeTimeEntry(${idx})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function addTeamMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const rate = parseFloat(document.getElementById('memberRate').value);
+
+            if (!name) {
+                showAlert('Please enter member name', 'error');
+                return;
+            }
+
+            if (isNaN(rate) || rate < 0) {
+                showAlert('Please enter a valid hourly rate', 'error');
+                return;
+            }
+
+            teamMembers.push({
+                name,
+                rate: parseFloat(rate.toFixed(2))
+            });
+
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberRate').value = '';
+
+            renderTeamMembers();
+            updateSummary();
+        }
+
+        function removeTeamMember(index) {
+            teamMembers.splice(index, 1);
+            renderTeamMembers();
+            updateSummary();
+        }
+
+        function renderTeamMembers() {
+            const list = document.getElementById('teamMembersList');
+
+            if (teamMembers.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+
+            list.innerHTML = teamMembers.map((member, idx) => `
+                <div class="team-member-row">
+                    <div style="font-size: 13px; font-weight: 500;">${member.name}</div>
+                    <div style="font-size: 13px; color: var(--color-text-secondary);">$${member.rate.toFixed(2)}/hr</div>
+                    <button type="button" class="btn btn-danger" onclick="removeTeamMember(${idx})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const totalHours = timeEntries.reduce((sum, entry) => sum + entry.hours, 0);
+            const avgRate = teamMembers.length > 0 ? teamMembers.reduce((sum, m) => sum + m.rate, 0) / teamMembers.length : 0;
+            const dailyCost = totalHours * avgRate;
+
+            if (totalHours > 0 && teamMembers.length > 0) {
+                document.getElementById('summary').style.display = 'block';
+            } else {
+                document.getElementById('summary').style.display = 'none';
+            }
+
+            document.getElementById('summaryHours').textContent = totalHours.toFixed(2);
+            document.getElementById('summaryMembers').textContent = teamMembers.length;
+            document.getElementById('summaryAvgRate').textContent = avgRate.toFixed(2);
+            document.getElementById('summaryCost').textContent = dailyCost.toFixed(2);
+        }
+
+        function showAlert(message, type) {
+            const errorAlert = document.getElementById('alertError');
+            const successAlert = document.getElementById('alertSuccess');
+
+            if (type === 'error') {
+                errorAlert.textContent = message;
+                errorAlert.classList.add('show');
+                successAlert.classList.remove('show');
+                setTimeout(() => errorAlert.classList.remove('show'), 4000);
+            } else {
+                successAlert.textContent = message;
+                successAlert.classList.add('show');
+                errorAlert.classList.remove('show');
+                setTimeout(() => successAlert.classList.remove('show'), 4000);
+            }
+        }
+
+        function validateForm() {
+            const date = document.getElementById('jobDate').value;
+            const workType = document.getElementById('workType').value.trim();
+
+            if (!date) {
+                showAlert('Please select a job date', 'error');
+                return false;
+            }
+
+            if (!workType) {
+                showAlert('Please enter work type/category', 'error');
+                return false;
+            }
+
+            if (teamMembers.length === 0) {
+                showAlert('Team members are required before adding time entries. Please add at least one team member first.', 'error');
+                return false;
+            }
+
+            if (timeEntries.length === 0) {
+                showAlert('Please add at least one time entry', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function buildPayload() {
+            const totalHours = timeEntries.reduce((sum, entry) => sum + entry.hours, 0);
+            const avgRate = teamMembers.reduce((sum, m) => sum + m.rate, 0) / teamMembers.length;
+            const dailyCost = totalHours * avgRate;
+
+            return {
+                date: document.getElementById('jobDate').value,
+                workType: document.getElementById('workType').value.trim(),
+                entries: timeEntries,
+                teamMembers: teamMembers,
+                totalHours: parseFloat(totalHours.toFixed(2)),
+                averageRate: parseFloat(avgRate.toFixed(2)),
+                dailyCost: parseFloat(dailyCost.toFixed(2)),
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        document.getElementById('timeLogForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            loading.classList.add('show');
+
+            const payload = buildPayload();
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showAlert('Time log submitted successfully', 'success');
+                    document.getElementById('timeLogForm').reset();
+                    timeEntries = [];
+                    teamMembers = [];
+                    renderTimeEntries();
+                    renderTeamMembers();
+                    document.getElementById('summary').style.display = 'none';
+                    setToday();
+                } else {
+                    showAlert('Failed to submit time log. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('Error submitting time log: ' + error.message, 'error');
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+
+        // Initialize
+        setToday();
+    </script>
+</body>
+</html>
